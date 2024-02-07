@@ -17,7 +17,7 @@
 #
 """This module contains all custom exceptions of pySMT."""
 
-import pysmt.operators as op
+import progpysmt.operators as op
 
 
 class PysmtException(Exception):

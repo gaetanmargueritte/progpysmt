@@ -25,18 +25,18 @@ particular solver.
 
 from functools import partial
 
-from pysmt.exceptions import (NoSolverAvailableError, SolverRedefinitionError,
+from progpysmt.exceptions import (NoSolverAvailableError, SolverRedefinitionError,
                               NoLogicAvailableError,
                               SolverAPINotFound)
-from pysmt.logics import QF_UFLIRA, LRA, QF_UFLRA
-from pysmt.logics import AUTO as AUTO_LOGIC
-from pysmt.logics import most_generic_logic, get_closer_logic
-from pysmt.logics import convert_logic_from_string
-from pysmt.oracles import get_logic
-from pysmt.solvers.qelim import (ShannonQuantifierEliminator,
+from progpysmt.logics import QF_UFLIRA, LRA, QF_UFLRA
+from progpysmt.logics import AUTO as AUTO_LOGIC
+from progpysmt.logics import most_generic_logic, get_closer_logic
+from progpysmt.logics import convert_logic_from_string
+from progpysmt.oracles import get_logic
+from progpysmt.solvers.qelim import (ShannonQuantifierEliminator,
                                  SelfSubstitutionQuantifierEliminator)
-from pysmt.solvers.solver import SolverOptions
-from pysmt.solvers.portfolio import Portfolio
+from progpysmt.solvers.solver import SolverOptions
+from progpysmt.solvers.portfolio import Portfolio
 
 DEFAULT_SOLVER_PREFERENCE_LIST = ['msat', 'z3', 'cvc4', 'yices', 'btor',
                                   'picosat', 'bdd']

@@ -31,9 +31,9 @@ on a factory service. Each BitVector width is represented by a
 different instance of BVType.
 
 """
-import pysmt
+import progpysmt
 
-from pysmt.exceptions import PysmtValueError, PysmtModeError
+from progpysmt.exceptions import PysmtValueError, PysmtModeError
 
 
 class PySMTType(object):

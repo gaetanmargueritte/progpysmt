@@ -33,14 +33,14 @@ it only once.
 
 """
 
-from pysmt.walkers.dag import DagWalker
+from progpysmt.walkers.dag import DagWalker
 assert DagWalker
 
-from pysmt.walkers.tree import TreeWalker
+from progpysmt.walkers.tree import TreeWalker
 assert TreeWalker
 
-from pysmt.walkers.identitydag import IdentityDagWalker
+from progpysmt.walkers.identitydag import IdentityDagWalker
 assert IdentityDagWalker
 
-from pysmt.walkers.generic import handles
+from progpysmt.walkers.generic import handles
 assert handles

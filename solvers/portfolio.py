@@ -18,8 +18,8 @@
 import logging
 from multiprocessing import Process, Queue, Pipe
 
-from pysmt.solvers.solver import IncrementalTrackingSolver, SolverOptions
-from pysmt.decorators import clear_pending_pop
+from progpysmt.solvers.solver import IncrementalTrackingSolver, SolverOptions
+from progpysmt.decorators import clear_pending_pop
 
 
 LOGGER = logging.getLogger(__name__)

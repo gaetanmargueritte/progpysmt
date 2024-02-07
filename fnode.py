@@ -17,9 +17,9 @@
 #
 """FNode are the building blocks of formulae."""
 import collections
-import pysmt
-import pysmt.smtlib
-from pysmt.operators import (FORALL, EXISTS, AND, OR, NOT, IMPLIES, IFF,
+import progpysmt
+import progpysmt.smtlib
+from progpysmt.operators import (FORALL, EXISTS, AND, OR, NOT, IMPLIES, IFF,
                              SYMBOL, FUNCTION,
                              REAL_CONSTANT, BOOL_CONSTANT, INT_CONSTANT,
                              PLUS, MINUS, TIMES, DIV,
@@ -46,17 +46,17 @@ from pysmt.operators import (FORALL, EXISTS, AND, OR, NOT, IMPLIES, IFF,
                              ARRAY_SELECT, ARRAY_STORE, ARRAY_VALUE,
                              ALGEBRAIC_CONSTANT)
 
-from pysmt.operators import  (BOOL_OPERATORS, THEORY_OPERATORS,
+from progpysmt.operators import  (BOOL_OPERATORS, THEORY_OPERATORS,
                               BV_OPERATORS, IRA_OPERATORS, ARRAY_OPERATORS,
                               STR_OPERATORS,
                               RELATIONS, CONSTANTS)
 
-from pysmt.typing import BOOL, REAL, INT, BVType, STRING
-from pysmt.decorators import deprecated, assert_infix_enabled
-from pysmt.utils import twos_complement
-from pysmt.constants import (Fraction, is_python_integer,
+from progpysmt.typing import BOOL, REAL, INT, BVType, STRING
+from progpysmt.decorators import deprecated, assert_infix_enabled
+from progpysmt.utils import twos_complement
+from progpysmt.constants import (Fraction, is_python_integer,
                              is_python_rational, is_python_boolean)
-from pysmt.exceptions import (PysmtValueError, PysmtModeError,
+from progpysmt.exceptions import (PysmtValueError, PysmtModeError,
                               UnsupportedOperatorError)
 
 
@@ -543,7 +543,7 @@ class FNode(object):
 
         See :py:class:`SmtPrinter`
         """
-        return pysmt.smtlib.printers.to_smtlib(self, daggify=daggify)
+        return progpysmt.smtlib.printers.to_smtlib(self, daggify=daggify)
 
     def is_function_application(self):
         """Test whether the node is a Function application."""
@@ -974,9 +974,9 @@ class FNode(object):
 
 def _env():
     """Aux function to obtain the environment."""
-    return pysmt.environment.get_env()
+    return progpysmt.environment.get_env()
 
 
 def _mgr():
     """Aux function to obtain the formula manager."""
-    return pysmt.environment.get_env().formula_manager
+    return progpysmt.environment.get_env().formula_manager

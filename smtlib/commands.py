@@ -50,7 +50,9 @@ SET_OPTION='set-option'
 SYNTH_FUN='synth-fun'
 CONSTRAINT_PBE='constraint-pbe'
 CONSTRAINT_SYNTAX='constraint-syntax'
+CONSTRAINT='constraint'
 CHECK_PROGSYNTH='check-progsynth'
+CHECK_SYNTH='check-synth'
 SOLUTION_PBE='solution-pbe'
 DEFINE_CONST='define-const'
 DECLARE_VAR='declare-var'
@@ -97,6 +99,9 @@ PROGSYNTH = [
     CHECK_PROGSYNTH,
     SOLUTION_PBE,
     DEFINE_CONST,
-    DECLARE_VAR
+    DECLARE_VAR,
+    CONSTRAINT,
+    CHECK_SYNTH,
+    DEFINE_FUN
 ]
 ALL_COMMANDS = SMT_LIB_2_5 + PROGSYNTH

@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from pysmt.walkers.tree import Walker
+from progpysmt.walkers.tree import Walker
 
 
 class DagWalker(Walker):

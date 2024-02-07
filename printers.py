@@ -17,11 +17,11 @@
 #
 from io import StringIO
 
-import pysmt.operators as op
-from pysmt.walkers import TreeWalker
-from pysmt.walkers.generic import handles
-from pysmt.utils import quote
-from pysmt.constants import is_pysmt_fraction, is_pysmt_integer
+import progpysmt.operators as op
+from progpysmt.walkers import TreeWalker
+from progpysmt.walkers.generic import handles
+from progpysmt.utils import quote
+from progpysmt.constants import is_pysmt_fraction, is_pysmt_integer
 
 
 class HRPrinter(TreeWalker):

@@ -23,8 +23,8 @@ if sys.version_info >= (3, 3):
 else:
     from collections import Iterable
 
-import pysmt.operators as op
-import pysmt.exceptions
+import progpysmt.operators as op
+import progpysmt.exceptions
 
 # NodeType to Function Name
 def nt_to_fun(o):
@@ -73,8 +73,8 @@ class Walker(object, metaclass=MetaNodeTypeHandler):
 
     def __init__(self, env=None):
         if env is None:
-            import pysmt.environment
-            env = pysmt.environment.get_env()
+            import progpysmt.environment
+            env = progpysmt.environment.get_env()
         self.env = env
 
         self.functions = {}
@@ -126,7 +126,7 @@ class Walker(object, metaclass=MetaNodeTypeHandler):
                 return self.functions[node_type](formula, **kwargs)
 
         node_type = formula.node_type()
-        raise pysmt.exceptions.UnsupportedOperatorError(node_type=node_type,
+        raise progpysmt.exceptions.UnsupportedOperatorError(node_type=node_type,
                                                         expression=formula)
 
 # EOC Walker

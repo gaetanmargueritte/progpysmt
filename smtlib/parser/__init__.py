@@ -17,7 +17,7 @@
 #
 import os
 
-from pysmt.exceptions import PysmtImportError
+from progpysmt.exceptions import PysmtImportError
 #
 # Try to import the Cython version of the parser.
 # Fall-back on the pure-python version if:
@@ -45,7 +45,7 @@ else:
 if USE_CYTHON:
     try:
         pyximport.install()
-        from pysmt.smtlib.parser.parser import *
+        from progpysmt.smtlib.parser.parser import *
     except ImportError as ex:
         if ENV_USE_CYTHON is None:
             # If not specified, fall-ack
@@ -54,7 +54,7 @@ if USE_CYTHON:
             raise PysmtImportError(str(ex))
 
 if not USE_CYTHON:
-    from pysmt.smtlib.parser.parser import *
+    from progpysmt.smtlib.parser.parser import *
 else:
     # pyximport.install() would be sufficient if we had a .pyx file
     # However, we currently are not annotating the .py file for cython,
@@ -85,14 +85,14 @@ else:
     pyximport.uninstall(*pyx)
     build_dir = os.path.join(os.path.expanduser('~'), '.pyxbld')
     path = os.path.join(os.path.dirname(__file__), "parser.py")
-    name="pysmt.smtlib.parser.parser"
+    name="progpysmt.smtlib.parser.parser"
 
     so_path = pyximport.build_module(name, path,
                                      pyxbuild_dir=build_dir)
     mod = imp.load_dynamic(name, so_path)
     assert mod.__file__ == so_path, (mod.__file__, so_path)
     # print(so_path)
-    from pysmt.smtlib.parser.parser import *
+    from progpysmt.smtlib.parser.parser import *
     
 
 

@@ -20,7 +20,7 @@ the SMTLIB and provides methods to compare and search for particular
 logics.
 """
 
-from pysmt.exceptions import UndefinedLogicError, NoLogicAvailableError
+from progpysmt.exceptions import UndefinedLogicError, NoLogicAvailableError
 
 
 class Theory(object):

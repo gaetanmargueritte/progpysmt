@@ -23,17 +23,18 @@ import itertools
 from warnings import warn
 from collections import deque
 
-import pysmt.smtlib.commands as smtcmd
-from pysmt.environment import get_env
-from pysmt.logics import get_logic_by_name, is_smt_logic, UndefinedLogicError
-from pysmt.exceptions import UnknownSmtLibCommandError, PysmtSyntaxError, ProgPysmtConstraintError
-from pysmt.exceptions import PysmtTypeError
-from pysmt.smtlib.script import SmtLibCommand, SmtLibScript
-from pysmt.smtlib.annotations import Annotations
-from pysmt.constants import Fraction
-from pysmt.typing import _TypeDecl, PartialType
-from pysmt.substituter import FunctionInterpretation
-from pysmt.pslobject import PSLObject, Method
+import progpysmt.smtlib.commands as smtcmd
+from progpysmt.environment import get_env
+from progpysmt.logics import get_logic_by_name, is_smt_logic, UndefinedLogicError
+from progpysmt.exceptions import UnknownSmtLibCommandError, PysmtSyntaxError, ProgPysmtConstraintError
+from progpysmt.exceptions import PysmtTypeError
+from progpysmt.smtlib.script import SmtLibCommand, SmtLibScript
+from progpysmt.smtlib.annotations import Annotations
+from progpysmt.constants import Fraction
+from progpysmt.typing import _TypeDecl, PartialType
+from progpysmt.substituter import FunctionInterpretation
+from progpysmt.pslobject import PSLObject, Method, Constraint
+import re
 
 
 def open_(fname):
@@ -468,6 +469,8 @@ class ProgSmtLibParser(object):
                          smtcmd.SOLUTION_PBE : self._cmd_solution_pbe,
                          smtcmd.DEFINE_CONST : self._cmd_define_const,
                          smtcmd.DECLARE_VAR : self._cmd_declare_var,
+                         smtcmd.CONSTRAINT : self._cmd_constraint,
+                         smtcmd.CHECK_SYNTH : self._cmd_check_synth,
                      }
         self.pcommands = {
                         smtcmd.SET_LOGIC : self._cmd_set_logic,
@@ -478,6 +481,9 @@ class ProgSmtLibParser(object):
                         smtcmd.SOLUTION_PBE : self._cmd_solution_pbe,
                         smtcmd.DEFINE_CONST : self._cmd_define_const,
                         smtcmd.DECLARE_VAR : self._cmd_declare_var,
+                        smtcmd.CONSTRAINT : self._cmd_constraint,
+                        smtcmd.CHECK_SYNTH : self._cmd_check_synth,
+                        smtcmd.DEFINE_FUN : self._cmd_define_fun
         }
         self.progsmt = None
 
@@ -851,12 +857,12 @@ class ProgSmtLibParser(object):
             return
 
 
-    def get_script(self, script):
+    def get_script(self, script, filename):
         """
         Takes a file object and returns either a SmtLibScript object representing the file or a PSL object adapted to ProgSynth SMT format
         """
         self._reset()
-        self.pslobject = PSLObject()
+        self.pslobject = PSLObject(filename)
         gen = self.get_command_generator(script)
         next(gen)
         if self.progsmt is None:
@@ -1164,6 +1170,8 @@ class ProgSmtLibParser(object):
                                              command)
         if current == "(":
             vartype = ''.join(self.parse_atoms(tokens, command, 1, stopatcommand=True))
+        else: 
+            vartype = current
         res += f" {vartype}"
         return res[1:], var2types
     
@@ -1172,6 +1180,8 @@ class ProgSmtLibParser(object):
         1) predeclaration: ((y1 t1) ... (yn tn))
         2) grouped rule listing: ((y1 t1 (g11 g1m1)) ... (yn tn (gn1 gnmn)))
         """
+        def remove_whitespaces(matchobj):
+            return re.sub(' ', '', matchobj.group(0)[1:-1])
         current = tokens.consume()
         if current !="(":
             raise PysmtSyntaxError("'(' expected at command %s"%(command), tokens.pos_info)
@@ -1188,17 +1198,15 @@ class ProgSmtLibParser(object):
         ytt = yt.copy()
         ytt.update(var2types)
         # grouped rule listing:
+        self.consume_opening(tokens, command)
         current = tokens.consume()
         if current !="(":
             raise PysmtSyntaxError("'(' expected", tokens.pos_info)
         while current != ")":
-            self.consume_opening(tokens, command)
             varname = self.parse_atom(tokens, command)
             vartype = tokens.consume()
             if vartype == "(":
                 vartype = ''.join(self.parse_atoms(tokens, command, 1, stopatcommand=True))
-            else:
-                self.consume_closing(tokens, command)
             if varname not in yt and yt[varname] != yt[vartype]:
                 raise PysmtSyntaxError("Couple (varname, vartype) of values (%s, %s) not existing in predeclared types %s" % (varname, vartype, yt))
             current = tokens.consume()
@@ -1210,8 +1218,11 @@ class ProgSmtLibParser(object):
                 if current == "(": # method definition
                     methname = self.parse_atom(tokens, current)
                     signature = self.parse_atoms(tokens, current, 1, stopatcommand=True)
+                    if len(signature) > 0:
+                        signature = re.sub(r'\((.+)\)', remove_whitespaces, ' '.join(signature))
+                        signature = signature.split(' ')
                     signature.append(varname)
-                    signature = ' -> '.join([ytt[x] for x in signature])
+                    signature = ' -> '.join([ytt[x] if x in ytt else x for x in signature])
                     interpretation[varname].append(Method(methname, signature))
                 else: # var definition
                     interpretation[varname].append(current)
@@ -1346,14 +1357,9 @@ class ProgSmtLibParser(object):
         """(set-logic <symbols>). As several logics can be loaded, stepatcommand is true"""
         elements = self.parse_atoms(tokens, current, 1, stopatcommand=True)
         if len(elements) == 1 and is_smt_logic(elements[0]) :
-            try:
-                self.progsmt = False
-                self.logic = get_logic_by_name(elements)
-                return SmtLibCommand(current, [self.logic])
-            except UndefinedLogicError:
-                warn("Unknown logic '" + elements +
-                    "'. Ignoring set-logic command.")
-                return SmtLibCommand(current, [None])
+            self.progsmt = True
+            self.logic = get_logic_by_name(elements[0])
+            self.pslobject.smtlogic = self.logic.name
         else:
             self.progsmt = True
             self.pslobject.format_logics(elements)
@@ -1362,7 +1368,7 @@ class ProgSmtLibParser(object):
     def _cmd_constraint_syntax(self, current, tokens):
         """(constraint-syntax <symbols>)"""
         val = self.parse_atoms(tokens, current, 1, stopatcommand=True)
-        self.pslobject.constraints.append(' '.join(val))
+        self.pslobject.constraints_syntax.append(' '.join(val))
 
     def _cmd_constraint_pbe(self, current, tokens):
         """(constraint-pbe (<func_name> <input*>) output)"""
@@ -1371,9 +1377,109 @@ class ProgSmtLibParser(object):
         if func_name != self.pslobject.func_name:
             raise ProgPysmtConstraintError("Unexpected %s func name. Expected %s at command %s"% (func_name, self.pslobject.func_name, current))
         inputs = self.parse_atoms(tokens, current, 1, stopatcommand=True)
-        outputs = self.parse_atom(tokens, current)
+        outputs = re.sub(' ', '', self.parse_atom(tokens, current))
         self.consume_closing(tokens, current)
         self.pslobject.pbe.append((inputs, outputs))
+
+    def _cmd_constraint(self, current, tokens):
+        """(constraint <constraint_body>)"""
+        constraint = Constraint(self.pslobject.variables, self.pslobject.constants)
+        self.consume_opening(tokens, current)
+        method_name, method_type = [], []
+        for n, t in self.pslobject.methods.keys():
+            method_name.append(n)
+            method_type.append(t)
+        res = self.__cmd_constraint_rec(current, tokens, constraint, method_name, method_type)
+        self.consume_closing(tokens, current)
+        self.pslobject.constraints.append(constraint)
+
+    def __cmd_constraint_rec(self, current, tokens, constraint, method_name, method_type, conditional_environment=False):
+        """searches for possible assignations in one single pass"""
+        def search_member(conditional_environment=False):
+            t = tokens.consume()
+            if t == '(': 
+                member = '(' +  self.__cmd_constraint_rec(current, tokens, constraint, method_name, method_type, conditional_environment)
+            else:
+                member = t
+            return member
+        def fill_value_if_possible(object: str, objective: str):
+            spl = iter(list(filter(lambda a: a != '', object.split(' '))))
+            res = ""
+            obfuscated = False # if True, then it was impossible to fill a value
+            is_initialized_var = lambda x: x in constraint.table_of_symbols and constraint.table_of_symbols[x] is not None
+            while True:
+                x = next(spl, "END")
+                if x == "END":
+                    break
+                if x in ['(', ')']:
+                    continue
+                elif is_initialized_var(x):
+                    res += constraint.table_of_symbols[x] + " "
+                elif x in method_name:
+                    pos = method_name.index(x)
+                    body, args = self.pslobject.methods[(x, method_type[pos])]
+                    body_spl = body.split(' ')[:-1]
+                    for y in args:
+                        x = next(spl)
+                        lambda_exp = lambda token: token if token != y else x if not(is_initialized_var(x)) else constraint.table_of_symbols[x]
+                        body_spl = list(map(lambda_exp, body_spl))
+                    body = ' '.join(body_spl)
+                    res += body + " "
+                elif x != objective and x != '' and x in constraint.table_of_symbols:
+                    res += x + " "
+                    obfuscated = True
+                elif x != '': # constant
+                    res += x + " "
+            return res[:-1], obfuscated
+        tok = tokens.consume()
+        res = ""
+        while tok != ')':
+            if tok == "=": # assignation, see if it is variable affectation
+                left_member = search_member()
+                right_member = search_member()
+                if not conditional_environment:
+                    if left_member in self.pslobject.variables:
+                        # manage OR boolean condition that allows multiple definitions
+                        if constraint.table_of_symbols[left_member] is not None:
+                            raise ProgPysmtConstraintError("Multiple definitions of the same variable %s" % left_member, tokens.pos_info)
+                        if right_member.startswith('('):
+                            right_member = ''.join(right_member[1:-1].split())
+                        constraint.table_of_symbols[left_member] = right_member
+                    elif right_member in self.pslobject.variables:
+                        if constraint.table_of_symbols[right_member] is not None:
+                            raise ProgPysmtConstraintError("Multiple definitions of the same variable %s" % right_member, tokens.pos_info)
+                        if left_member.startswith('('):
+                            left_member = ''.join(left_member[1:-1].split())
+                        constraint.table_of_symbols[right_member] = left_member
+                    else: # is probably PBE, search for to-be-synthetized method
+                        searched = self.pslobject.func_name
+                        lobfuscated = True
+                        robfuscated = True
+                        if searched in left_member:
+                            pbe, lobfuscated = fill_value_if_possible(left_member[:-1], searched)
+                            res, robfuscated = fill_value_if_possible(right_member, searched)
+                            constraint.pbe[pbe] = res
+                        elif searched in right_member:
+                            pbe, robfuscated = fill_value_if_possible(right_member[:-1], searched)
+                            res, lobfuscated = fill_value_if_possible(left_member, searched)
+                            constraint.pbe[pbe] = res
+                        if not lobfuscated and not robfuscated:
+                            pbe_values = pbe.split(' ')[1:]
+                            pbe_result = ''.join(constraint.pbe[pbe].split(' '))
+                            self.pslobject.pbe.append((pbe_values, pbe_result))
+                res += tok + ' ' + left_member + ' ' + right_member
+            elif tok == '(':
+                res += '(' + self.__cmd_constraint_rec(current, tokens, constraint, method_name, method_type)
+            elif tok == 'ite':
+                bool_condition = search_member(True)
+                left_member = search_member()
+                right_member = search_member()
+                res += tok + ' ' + bool_condition + ' ' + left_member + ' ' + right_member
+            else:
+                res += ' ' + tok + ' '
+            tok = tokens.consume()
+        res += ' ' + tok
+        return res
 
     def _cmd_define_const(self, current, tokens):
         """(define-const (<const_type> <possible_values>*))"""
@@ -1394,38 +1500,49 @@ class ProgSmtLibParser(object):
         type = tokens.consume()
         if type == '(':
             type = ''.join(self.parse_atoms(tokens, current, 1, stopatcommand=True))
-        #self.pslobject.
         self.consume_closing(tokens, current)
-        # unfinished
+        self.pslobject.variables[varname] = type
 
     def _cmd_solution_pbe(self, current, tokens):
         """(solution-pbe (<program>*))"""
         solution = self.parse_atoms(tokens, current, 1, stopatcommand=True)
         self.pslobject.solution = ' '.join(solution)
     
-    def _cmd_synth_fun(self, current, tokens):
+    def _cmd_synth_fun(self, command, tokens):
         """(synth-fun <func_name> (<input_var> <input_type>)* <output_type>)"""
-        func_name = self.parse_atom(tokens, current)
-        signature, var2type = self.parse_signature(tokens, current)
+        if self.pslobject.func_name is not None:
+            raise PysmtSyntaxError("Multiple calls of synth-fun. Existing method %s found." % self.pslobject.func_name)
+        func_name = self.parse_atom(tokens, command)
+        signature, var2type = self.parse_signature(tokens, command)
         current = tokens.consume("Unexpected end of stream in %s command." % 
-                                 current)
+                                 command)
         if current != ")":
-            self.pslobject.grammar_interpretation = self.parse_grammar(tokens, current, var2type)
+            self.pslobject.grammar_interpretation = self.parse_grammar(tokens, command, var2type)
+            # retrocompatibility
+            current = tokens.consume("Unexpected end of stream in %s command." % 
+                                 command)
+            if current != ')':
+                tokens.add_extra_token(current)
         self.pslobject.func_name, self.pslobject.type = func_name, signature
 
-    def _cmd_check_progsynth(self, current, tokens):
+    def _cmd_check_progsynth(self, command, tokens):
         """(check-progsynth)"""
-        self.consume_closing(tokens, current)
+        self.consume_closing(tokens, command)
         self.pslobject.check = True
+    
+    def _cmd_check_synth(self, command, tokens):
+        """(check-synth)"""
+        self.consume_closing(tokens, command)
+        # self.pslobject.syguscheck = True
 
-    def _cmd_declare_const(self, current, tokens):
+    def _cmd_declare_const(self, command, tokens):
         """(declare-const <symbol> <sort>)"""
-        var = self.parse_atom(tokens, current)
-        typename = self.parse_type(tokens, current)
-        self.consume_closing(tokens, current)
+        var = self.parse_atom(tokens, command)
+        typename = self.parse_type(tokens, command)
+        self.consume_closing(tokens, command)
         v = self._get_var(var, typename)
         self.cache.bind(var, v)
-        return SmtLibCommand(current, [v])
+        return SmtLibCommand(command, [v])
 
     def _cmd_get_value(self, current, tokens):
         """(get-value (<term>+)"""
@@ -1459,16 +1576,12 @@ class ProgSmtLibParser(object):
     
     def _cmd_define_fun_prog(self, current, tokens):
         """(define-fun <fun_def>)"""
-        formal = []
-        var = self.parse_atom(tokens, current)
-        namedparams = self.parse_named_params(tokens, current)
-        rtype = self.parse_type(tokens, current)
-        bindings = []
-        for (x,t) in namedparams:
-            v = self.env.formula_manager.FreshSymbol(typename=t, template="__"+x+"%d")
-            print(v)
-        assert 0
-
+        func_name = self.parse_atom(tokens, current)
+        func_type, func_params = self.parse_signature(tokens, current)
+        func_body = self.parse_atoms(tokens, current, 1, stopatcommand=True)
+        func_body = ' '.join(func_body)
+        self.pslobject.methods[(func_name, func_type)] = (func_body, func_params)
+        
     def _cmd_define_fun_smt(self, current, tokens):
         """(define-fun <fun_def>)"""
         formal = []

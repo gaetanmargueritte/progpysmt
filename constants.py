@@ -16,7 +16,7 @@
 
 import os
 
-from pysmt.exceptions import PysmtImportError
+from progpysmt.exceptions import PysmtImportError
 # The environment variable can be used to force the configuration
 # of the Fraction class.
 #

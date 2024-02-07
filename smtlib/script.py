@@ -20,13 +20,13 @@ import warnings
 from collections import namedtuple
 from io import StringIO
 
-import pysmt.smtlib.commands as smtcmd
-from pysmt.exceptions import (UnknownSmtLibCommandError, NoLogicAvailableError,
+import progpysmt.smtlib.commands as smtcmd
+from progpysmt.exceptions import (UnknownSmtLibCommandError, NoLogicAvailableError,
                               UndefinedLogicError, PysmtValueError)
-from pysmt.smtlib.printers import SmtPrinter, SmtDagPrinter, quote
-from pysmt.oracles import get_logic
-from pysmt.logics import get_closer_smtlib_logic, Logic, SMTLIB2_LOGICS
-from pysmt.environment import get_env
+from progpysmt.smtlib.printers import SmtPrinter, SmtDagPrinter, quote
+from progpysmt.oracles import get_logic
+from progpysmt.logics import get_closer_smtlib_logic, Logic, SMTLIB2_LOGICS
+from progpysmt.environment import get_env
 
 
 def check_sat_filter(log):

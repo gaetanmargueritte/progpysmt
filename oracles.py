@@ -26,13 +26,13 @@ properties of formulae.
  * TypesOracle provides the list of types in the formula
 """
 
-import pysmt
-import pysmt.walkers as walkers
-import pysmt.operators as op
+import progpysmt
+import progpysmt.walkers as walkers
+import progpysmt.operators as op
 
-from pysmt import typing
+from progpysmt import typing
 
-from pysmt.logics import Logic, Theory, get_closer_pysmt_logic
+from progpysmt.logics import Logic, Theory, get_closer_pysmt_logic
 
 
 class SizeOracle(walkers.DagWalker):

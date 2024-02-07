@@ -18,10 +18,10 @@
 from functools import partial
 from io import StringIO
 
-import pysmt.operators as op
-from pysmt.environment import get_env
-from pysmt.walkers import TreeWalker, DagWalker, handles
-from pysmt.utils import quote
+import progpysmt.operators as op
+from progpysmt.environment import get_env
+from progpysmt.walkers import TreeWalker, DagWalker, handles
+from progpysmt.utils import quote
 
 def write_annotations(f):
     def resf(self, formula, *args, **kwargs):

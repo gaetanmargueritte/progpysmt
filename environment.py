@@ -21,15 +21,15 @@ singleton objects that are used throughout the system, such as the
 FormulaManager, Simplifier, HRSerializer, SimpleTypeChecker.
 """
 
-import pysmt.simplifier
-import pysmt.printers
-import pysmt.substituter
-import pysmt.type_checker
-import pysmt.oracles
-import pysmt.formula
-import pysmt.factory
-import pysmt.decorators
-import pysmt.typing
+import progpysmt.simplifier
+import progpysmt.printers
+import progpysmt.substituter
+import progpysmt.type_checker
+import progpysmt.oracles
+import progpysmt.formula
+import progpysmt.factory
+import progpysmt.decorators
+import progpysmt.typing
 
 
 class Environment(object):
@@ -41,19 +41,19 @@ class Environment(object):
     of classes for the different services, by changing the class
     attributes.
     """
-    TypeCheckerClass = pysmt.type_checker.SimpleTypeChecker
-    FormulaManagerClass = pysmt.formula.FormulaManager
-    TypeManagerClass = pysmt.typing.TypeManager
-    SimplifierClass = pysmt.simplifier.Simplifier
+    TypeCheckerClass = progpysmt.type_checker.SimpleTypeChecker
+    FormulaManagerClass = progpysmt.formula.FormulaManager
+    TypeManagerClass = progpysmt.typing.TypeManager
+    SimplifierClass = progpysmt.simplifier.Simplifier
     #SubstituterClass = pysmt.substituter.MSSubstituter
-    SubstituterClass = pysmt.substituter.MGSubstituter
-    HRSerializerClass = pysmt.printers.HRSerializer
-    QuantifierOracleClass = pysmt.oracles.QuantifierOracle
-    TheoryOracleClass = pysmt.oracles.TheoryOracle
-    FreeVarsOracleClass= pysmt.oracles.FreeVarsOracle
-    SizeOracleClass = pysmt.oracles.SizeOracle
-    AtomsOracleClass = pysmt.oracles.AtomsOracle
-    TypesOracleClass = pysmt.oracles.TypesOracle
+    SubstituterClass = progpysmt.substituter.MGSubstituter
+    HRSerializerClass = progpysmt.printers.HRSerializer
+    QuantifierOracleClass = progpysmt.oracles.QuantifierOracle
+    TheoryOracleClass = progpysmt.oracles.TheoryOracle
+    FreeVarsOracleClass= progpysmt.oracles.FreeVarsOracle
+    SizeOracleClass = progpysmt.oracles.SizeOracle
+    AtomsOracleClass = progpysmt.oracles.AtomsOracle
+    TypesOracleClass = progpysmt.oracles.TypesOracle
 
     def __init__(self):
         self._stc = self.TypeCheckerClass(self)
@@ -153,7 +153,7 @@ class Environment(object):
         function to a given walker, so that the walker will be able to
         handle the new nodetype.
 
-        See :py:meth:`pysmt.walkers.generic.Walker.walk_error` for
+        See :py:meth:`progpysmt.walkers.generic.Walker.walk_error` for
         more information.
         """
         # self.dwf is a map of maps: {nodetype, {walker: function}}
@@ -166,7 +166,7 @@ class Environment(object):
     @property
     def factory(self):
         if self._factory is None:
-            self._factory = pysmt.factory.Factory(self)
+            self._factory = progpysmt.factory.Factory(self)
         return self._factory
 
     def __enter__(self):

@@ -1,5 +1,5 @@
-from typing import Dict, List, Tuple, Set
-from pysmt.exceptions import PysmtSyntaxError
+from typing import Dict, List, Tuple, Set, Any
+from progpysmt.exceptions import PysmtSyntaxError
 
 class Method:
     def __init__(self, name: str , signature: str) -> None:
@@ -8,18 +8,34 @@ class Method:
 
     def __str__(self) -> str:
         return "%s (%s)"%(self.name, self.signature)
+    
+class Constraint:
+    def __init__(self, var: Dict[str, str], const: Dict[str, Set[str]]) -> None:
+        self.table_of_symbols: Dict[str, List[Any]] = {}
+        for v in var:
+            self.table_of_symbols[v] = None
+        for c in const:
+            for v in const[c]:
+                self.table_of_symbols[v] = v
+        self.pbe: Dict[str, Any] = {}
+        
 
 class PSLObject:
-    def __init__(self) -> None:
+    def __init__(self, filename: str) -> None:
+        self.filename: str = filename
         self.logics: List[str] = []
         self.type: str = None
         self.pbe: List[Tuple[List[str], str]] = []
         self.func_name: str = None
-        self.constraints: List[str] = []
+        self.constraints_syntax: List[str] = []
         self.check: bool = False
         self.solution: str = None
         self.constants: Dict[str, Set[str]] = {}
         self.grammar_interpretation: Dict[str, List[str|Method]] = {}
+        self.variables: Dict[str, str] = {}
+        self.constraints: List[Constraint] = []
+        self.smtlogic: str = ''
+        self.methods: Dict[Tuple(str, str), str] = {}
 
     def format_logics(self, elements: List[str]) -> None:
         res = []

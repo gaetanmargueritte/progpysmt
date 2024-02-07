@@ -17,20 +17,20 @@
 #
 import math
 
-import pysmt.walkers
-from pysmt.walkers import handles
-import pysmt.operators as op
-import pysmt.typing as types
-from pysmt.utils import set_bit
-from pysmt.exceptions import PysmtValueError
-from pysmt.fnode import FNode
+import progpysmt.walkers
+from progpysmt.walkers import handles
+import progpysmt.operators as op
+import progpysmt.typing as types
+from progpysmt.utils import set_bit
+from progpysmt.exceptions import PysmtValueError
+from progpysmt.fnode import FNode
 
 
-class Simplifier(pysmt.walkers.DagWalker):
+class Simplifier(progpysmt.walkers.DagWalker):
     """Perform basic simplifications of the input formula."""
 
     def __init__(self, env=None):
-        pysmt.walkers.DagWalker.__init__(self, env=env)
+        progpysmt.walkers.DagWalker.__init__(self, env=env)
         self.manager = self.env.formula_manager
         self._validate_simplifications = None
         self.original_walk = self.walk
@@ -62,8 +62,8 @@ class Simplifier(pysmt.walkers.DagWalker):
         return formula
 
     def walk_debug(self, formula, **kwargs):
-        from pysmt.shortcuts import Equals, Iff, get_type, is_valid
-        from pysmt.typing import BOOL
+        from progpysmt.shortcuts import Equals, Iff, get_type, is_valid
+        from progpysmt.typing import BOOL
 
         if formula in self.memoization:
             return self.memoization[formula]
@@ -305,7 +305,7 @@ class Simplifier(pysmt.walkers.DagWalker):
                     if const_val != -1:
                         const_val = -const_val
                         if const.is_algebraic_constant():
-                            from pysmt.constants import Numeral
+                            from progpysmt.constants import Numeral
                             const = self.manager._Algebraic(Numeral(const_val))
                         elif ttype.is_real_type():
                             const = self.manager.Real(const_val)
@@ -322,7 +322,7 @@ class Simplifier(pysmt.walkers.DagWalker):
 
         const = None
         if is_algebraic:
-            from pysmt.constants import Numeral
+            from progpysmt.constants import Numeral
             const = self.manager._Algebraic(Numeral(constant_add))
         elif ttype.is_real_type():
             const = self.manager.Real(constant_add)
@@ -375,7 +375,7 @@ class Simplifier(pysmt.walkers.DagWalker):
 
         const = None
         if is_algebraic:
-            from pysmt.constants import Numeral
+            from progpysmt.constants import Numeral
             const = self.manager._Algebraic(Numeral(constant_mul))
         elif ttype.is_real_type():
             const = self.manager.Real(constant_mul)
@@ -406,7 +406,7 @@ class Simplifier(pysmt.walkers.DagWalker):
             return self.manager.Int(l**r)
 
         if args[0].is_algebraic_constant():
-            from pysmt.constants import Numeral
+            from progpysmt.constants import Numeral
             l = args[0].constant_value()
             r = args[1].constant_value()
             return self.manager._Algebraic(Numeral(l**r))
@@ -431,7 +431,7 @@ class Simplifier(pysmt.walkers.DagWalker):
 
         if sl.is_algebraic_constant() and \
            sr.is_algebraic_constant():
-            from pysmt.constants import Numeral
+            from progpysmt.constants import Numeral
             l = sl.constant_value()
             r = sr.constant_value()
             return self.mananger._Algebraic(Numeral(l - r))
@@ -1105,8 +1105,8 @@ class BddSimplifier(Simplifier):
         self._validate_simplifications = value
 
     def simplify(self, formula):
-        from pysmt.oracles import get_logic
-        from pysmt.logics import BOOL, QF_BOOL
+        from progpysmt.oracles import get_logic
+        from progpysmt.logics import BOOL, QF_BOOL
         if self.bool_abstraction:
             logic = get_logic(formula)
             if logic > QF_BOOL and logic != BOOL:

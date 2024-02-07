@@ -15,11 +15,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-import pysmt.logics
+import progpysmt.logics
 
-from pysmt.walkers.identitydag import IdentityDagWalker
-from pysmt.utils import all_assignments
-from pysmt.exceptions import InternalSolverError
+from progpysmt.walkers.identitydag import IdentityDagWalker
+from progpysmt.utils import all_assignments
+from progpysmt.exceptions import InternalSolverError
 
 
 class QuantifierEliminator(object):
@@ -65,7 +65,7 @@ class QuantifierEliminator(object):
 class ShannonQuantifierEliminator(QuantifierEliminator, IdentityDagWalker):
     """Quantifier Elimination using Shannon Expansion."""
 
-    LOGICS = [pysmt.logics.BOOL]
+    LOGICS = [progpysmt.logics.BOOL]
 
     def __init__(self, environment, logic=None):
         IdentityDagWalker.__init__(self, env=environment)
@@ -112,7 +112,7 @@ class SelfSubstitutionQuantifierEliminator(QuantifierEliminator, IdentityDagWalk
      Dror Fried, Lucas M. Tabajara, and Moshe Y. Vardi,
      CAV 2016
     """
-    LOGICS = [pysmt.logics.BOOL]
+    LOGICS = [progpysmt.logics.BOOL]
 
     def __init__(self, environment, logic=None):
         IdentityDagWalker.__init__(self, env=environment)

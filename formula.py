@@ -35,15 +35,15 @@ else:
 
 import warnings
 
-import pysmt.typing as types
-import pysmt.operators as op
+import progpysmt.typing as types
+import progpysmt.operators as op
 
 
-from pysmt.fnode import FNode, FNodeContent
-from pysmt.exceptions import UndefinedSymbolError, PysmtValueError,PysmtTypeError
-from pysmt.walkers.identitydag import IdentityDagWalker
-from pysmt.constants import Fraction
-from pysmt.constants import (is_pysmt_fraction,
+from progpysmt.fnode import FNode, FNodeContent
+from progpysmt.exceptions import UndefinedSymbolError, PysmtValueError,PysmtTypeError
+from progpysmt.walkers.identitydag import IdentityDagWalker
+from progpysmt.constants import Fraction
+from progpysmt.constants import (is_pysmt_fraction,
                              is_pysmt_integer,
                              is_python_rational,
                              is_python_integer,

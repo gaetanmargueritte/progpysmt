@@ -18,7 +18,7 @@
 from functools import wraps
 import warnings
 
-import pysmt.exceptions
+import progpysmt.exceptions
 
 class deprecated(object):
     """This is a decorator which can be used to mark functions
@@ -95,7 +95,7 @@ def catch_conversion_error(f):
 def assert_infix_enabled(f):
     """Raise an exception if infix notation is not enabled."""
     from functools import wraps
-    from pysmt.exceptions import PysmtModeError
+    from progpysmt.exceptions import PysmtModeError
     INFIX_ERROR_MSG = """Infix notation is not enabled for the current environment.
 Enable it by setting enable_infix_notation to True."""
 

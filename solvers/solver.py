@@ -15,10 +15,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from pysmt.typing import BOOL
-from pysmt.solvers.options import SolverOptions
-from pysmt.decorators import clear_pending_pop
-from pysmt.exceptions import (SolverReturnedUnknownResultError, PysmtValueError,
+from progpysmt.typing import BOOL
+from progpysmt.solvers.options import SolverOptions
+from progpysmt.decorators import clear_pending_pop
+from progpysmt.exceptions import (SolverReturnedUnknownResultError, PysmtValueError,
                               SolverNotConfiguredForUnsatCoresError,
                               PysmtTypeError, SolverStatusError)
 
