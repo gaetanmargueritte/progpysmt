@@ -16,14 +16,7 @@
 #   limitations under the License.
 #
 
-VERSION = (0, 9, 5)
-
-# Try to provide human-readable version of latest commit for dev versions
-# E.g. v0.5.1-4-g49a49f2-wip
-#      * 4 commits after tag v0.5.1
-#      * Latest commit "49a49f2"
-#      * -wip: Working tree is dirty (non committed stuff)
-# See: https://git-scm.com/docs/git-describe
+VERSION = (0, 1, 5)
 if len(VERSION) == 5:
     import subprocess
 

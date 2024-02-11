@@ -31,8 +31,6 @@ on a factory service. Each BitVector width is represented by a
 different instance of BVType.
 
 """
-import progpysmt
-
 from progpysmt.exceptions import PysmtValueError, PysmtModeError
 
 
@@ -348,7 +346,7 @@ class _TypeDecl(object):
         self.custom_type = False
 
     def __call__(self, *args):
-        env = pysmt.environment.get_env()
+        env = progpysmt.environment.get_env()
         # Note: This uses the global type manager
         if not env.enable_infix_notation:
             raise PysmtModeError(
@@ -589,23 +587,23 @@ def assert_are_types(targets, func_name):
 
 def BVType(width=32):
     """Returns the BV type for the given width."""
-    mgr = pysmt.environment.get_env().type_manager
+    mgr = progpysmt.environment.get_env().type_manager
     return mgr.BVType(width=width)
 
 
 def FunctionType(return_type, param_types):
     """Returns Function Type with the given arguments."""
-    mgr = pysmt.environment.get_env().type_manager
+    mgr = progpysmt.environment.get_env().type_manager
     return mgr.FunctionType(return_type=return_type, param_types=param_types)
 
 
 def ArrayType(index_type, elem_type):
     """Returns the Array type with the given arguments."""
-    mgr = pysmt.environment.get_env().type_manager
+    mgr = progpysmt.environment.get_env().type_manager
     return mgr.ArrayType(index_type=index_type, elem_type=elem_type)
 
 
 def Type(name, arity=0):
     """Returns the Type Declaration with the given name (sort declaration)."""
-    mgr = pysmt.environment.get_env().type_manager
+    mgr = progpysmt.environment.get_env().type_manager
     return mgr.Type(name=name, arity=arity)
