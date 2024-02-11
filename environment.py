@@ -41,16 +41,17 @@ class Environment(object):
     of classes for the different services, by changing the class
     attributes.
     """
+
     TypeCheckerClass = progpysmt.type_checker.SimpleTypeChecker
     FormulaManagerClass = progpysmt.formula.FormulaManager
     TypeManagerClass = progpysmt.typing.TypeManager
     SimplifierClass = progpysmt.simplifier.Simplifier
-    #SubstituterClass = pysmt.substituter.MSSubstituter
+    # SubstituterClass = pysmt.substituter.MSSubstituter
     SubstituterClass = progpysmt.substituter.MGSubstituter
     HRSerializerClass = progpysmt.printers.HRSerializer
     QuantifierOracleClass = progpysmt.oracles.QuantifierOracle
     TheoryOracleClass = progpysmt.oracles.TheoryOracle
-    FreeVarsOracleClass= progpysmt.oracles.FreeVarsOracle
+    FreeVarsOracleClass = progpysmt.oracles.FreeVarsOracle
     SizeOracleClass = progpysmt.oracles.SizeOracle
     AtomsOracleClass = progpysmt.oracles.AtomsOracle
     TypesOracleClass = progpysmt.oracles.TypesOracle
@@ -112,37 +113,37 @@ class Environment(object):
 
     @property
     def stc(self):
-        """ Get the Simple Type Checker """
+        """Get the Simple Type Checker"""
         return self._stc
 
     @property
     def qfo(self):
-        """ Get the Quantifier Oracle """
+        """Get the Quantifier Oracle"""
         return self._qfo
 
     @property
     def ao(self):
-        """ Get the Atoms Oracle """
+        """Get the Atoms Oracle"""
         return self._ao
 
     @property
     def theoryo(self):
-        """ Get the Theory Oracle """
+        """Get the Theory Oracle"""
         return self._theoryo
 
     @property
     def typeso(self):
-        """ Get the Types Oracle """
+        """Get the Types Oracle"""
         return self._typeso
 
     @property
     def fvo(self):
-        """ Get the FreeVars Oracle """
+        """Get the FreeVars Oracle"""
         return self._fvo
 
     @property
     def sizeo(self):
-        """ Get the Size Oracle """
+        """Get the Size Oracle"""
         return self._sizeo
 
     def add_dynamic_walker_function(self, nodetype, walker, function):
@@ -170,7 +171,7 @@ class Environment(object):
         return self._factory
 
     def __enter__(self):
-        """Entering a Context """
+        """Entering a Context"""
         push_env(self)
         return self
 
@@ -178,14 +179,17 @@ class Environment(object):
         """Remove environment from global stack."""
         pop_env()
 
+
 # EOC Environment
 
 #### GLOBAL ENVIRONMENTS STACKS ####
 ENVIRONMENTS_STACK = []
 
+
 def get_env():
     """Returns the Environment at the head of the stack."""
     return ENVIRONMENTS_STACK[-1]
+
 
 def push_env(env=None):
     """Push a env in the stack. If env is None, a new Environment is created."""
@@ -193,15 +197,18 @@ def push_env(env=None):
         env = Environment()
     ENVIRONMENTS_STACK.append(env)
 
+
 def pop_env():
     """Pop an env from the stack."""
     return ENVIRONMENTS_STACK.pop()
+
 
 def reset_env():
     """Destroys and recreate the head environment."""
     pop_env()
     push_env()
     return get_env()
+
 
 # Create the default environment
 push_env()

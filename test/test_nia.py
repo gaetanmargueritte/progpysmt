@@ -22,7 +22,6 @@ from pysmt.logics import QF_NIA, NIA
 
 
 class TestNIA(TestCase):
-
     def test_nia_pos_const_div_pos_const(self):
         """Integer division between positive constants"""
         a = Symbol("a", INT)
@@ -180,8 +179,7 @@ class TestNIA(TestCase):
         i_5 = Int(5)
 
         # a = 5 & b > 0 & (a / b) = 2
-        check = And(Equals(a, i_5), GT(b, i_0),
-                    Equals(Div(a, b), i_2))
+        check = And(Equals(a, i_5), GT(b, i_0), Equals(Div(a, b), i_2))
         for sname in get_env().factory.all_solvers(logic=QF_NIA):
             with Solver(name=sname) as s:
                 s.add_assertion(check)

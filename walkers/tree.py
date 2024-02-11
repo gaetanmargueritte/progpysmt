@@ -17,6 +17,7 @@
 #
 from progpysmt.walkers.generic import Walker
 
+
 class TreeWalker(Walker):
     """TreeWalker treats the formula as a Tree and does not perform memoization.
 
@@ -78,7 +79,7 @@ class TreeWalker(Walker):
         raise NotImplementedError
 
     def walk_skip(self, formula):
-        """ Default function to skip a node and process the children """
+        """Default function to skip a node and process the children"""
         for s in formula.args():
             yield s
         return

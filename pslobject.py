@@ -1,14 +1,16 @@
 from typing import Dict, List, Tuple, Set, Any
 from progpysmt.exceptions import PysmtSyntaxError
 
+
 class Method:
-    def __init__(self, name: str , signature: str) -> None:
+    def __init__(self, name: str, signature: str) -> None:
         self.name = name
         self.signature = signature
 
     def __str__(self) -> str:
-        return "%s (%s)"%(self.name, self.signature)
-    
+        return "%s (%s)" % (self.name, self.signature)
+
+
 class Constraint:
     def __init__(self, var: Dict[str, str], const: Dict[str, Set[str]]) -> None:
         self.table_of_symbols: Dict[str, List[Any]] = {}
@@ -18,7 +20,7 @@ class Constraint:
             for v in const[c]:
                 self.table_of_symbols[v] = v
         self.pbe: Dict[str, Any] = {}
-        
+
 
 class PSLObject:
     def __init__(self, filename: str) -> None:
@@ -31,10 +33,10 @@ class PSLObject:
         self.check: bool = False
         self.solution: str = None
         self.constants: Dict[str, Set[str]] = {}
-        self.grammar_interpretation: Dict[str, List[str|Method]] = {}
+        self.grammar_interpretation: Dict[str, List[str | Method]] = {}
         self.variables: Dict[str, str] = {}
         self.constraints: List[Constraint] = []
-        self.smtlogic: str = ''
+        self.smtlogic: str = ""
         self.methods: Dict[Tuple(str, str), str] = {}
 
     def format_logics(self, elements: List[str]) -> None:
@@ -44,10 +46,16 @@ class PSLObject:
         args = []
         for e in elements:
             if e == "(":
-                if opened: raise PysmtSyntaxError("Unexpected token %s of command set-logic" % e)
+                if opened:
+                    raise PysmtSyntaxError(
+                        "Unexpected token %s of command set-logic" % e
+                    )
                 opened = True
             elif e == ")":
-                if not opened: raise PysmtSyntaxError("Unexpected token %s of command set-logic" % e)
+                if not opened:
+                    raise PysmtSyntaxError(
+                        "Unexpected token %s of command set-logic" % e
+                    )
                 opened = False
             else:
                 if logic == "":
@@ -59,4 +67,3 @@ class PSLObject:
                 logic = ""
                 args = []
         self.logics = res
-

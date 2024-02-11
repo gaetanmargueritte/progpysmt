@@ -21,8 +21,12 @@ from collections import namedtuple
 from io import StringIO
 
 import progpysmt.smtlib.commands as smtcmd
-from progpysmt.exceptions import (UnknownSmtLibCommandError, NoLogicAvailableError,
-                              UndefinedLogicError, PysmtValueError)
+from progpysmt.exceptions import (
+    UnknownSmtLibCommandError,
+    NoLogicAvailableError,
+    UndefinedLogicError,
+    PysmtValueError,
+)
 from progpysmt.smtlib.printers import SmtPrinter, SmtDagPrinter, quote
 from progpysmt.oracles import get_logic
 from progpysmt.logics import get_closer_smtlib_logic, Logic, SMTLIB2_LOGICS
@@ -35,12 +39,12 @@ def check_sat_filter(log):
 
     Raises errors in case a unique check-sat command cannot be located.
     """
-    filtered = [(x,y) for x,y in log if x == smtcmd.CHECK_SAT]
+    filtered = [(x, y) for x, y in log if x == smtcmd.CHECK_SAT]
     assert len(filtered) == 1
     return filtered[0][1]
 
 
-class SmtLibCommand(namedtuple('SmtLibCommand', ['name', 'args'])):
+class SmtLibCommand(namedtuple("SmtLibCommand", ["name", "args"])):
     def serialize(self, outstream=None, printer=None, daggify=True):
         """Serializes the SmtLibCommand into outstream using the given printer.
 
@@ -60,16 +64,17 @@ class SmtLibCommand(namedtuple('SmtLibCommand', ['name', 'args'])):
             else:
                 printer = SmtPrinter(outstream)
         else:
-            assert (outstream is not None and printer is not None) or \
-                   (outstream is None and printer is None), \
-                   "Exactly one of outstream and printer must be set."
+            assert (outstream is not None and printer is not None) or (
+                outstream is None and printer is None
+            ), "Exactly one of outstream and printer must be set."
 
         if self.name == smtcmd.SET_OPTION:
-            outstream.write("(%s %s %s)" % (self.name,self.args[0],self.args[1]))
+            outstream.write("(%s %s %s)" % (self.name, self.args[0], self.args[1]))
 
         elif self.name == smtcmd.SET_INFO:
-            outstream.write("(%s %s %s)" % (self.name,self.args[0],
-                                            quote(self.args[1])))
+            outstream.write(
+                "(%s %s %s)" % (self.name, self.args[0], quote(self.args[1]))
+            )
 
         elif self.name == smtcmd.ASSERT:
             outstream.write("(%s " % self.name)
@@ -83,9 +88,14 @@ class SmtLibCommand(namedtuple('SmtLibCommand', ['name', 'args'])):
                 outstream.write(" ")
             outstream.write("))")
 
-        elif self.name in [smtcmd.CHECK_SAT, smtcmd.EXIT,
-                           smtcmd.RESET_ASSERTIONS, smtcmd.GET_UNSAT_CORE,
-                           smtcmd.GET_ASSIGNMENT, smtcmd.GET_MODEL]:
+        elif self.name in [
+            smtcmd.CHECK_SAT,
+            smtcmd.EXIT,
+            smtcmd.RESET_ASSERTIONS,
+            smtcmd.GET_UNSAT_CORE,
+            smtcmd.GET_ASSIGNMENT,
+            smtcmd.GET_MODEL,
+        ]:
             outstream.write("(%s)" % self.name)
 
         elif self.name == smtcmd.SET_LOGIC:
@@ -94,20 +104,25 @@ class SmtLibCommand(namedtuple('SmtLibCommand', ['name', 'args'])):
         elif self.name in [smtcmd.DECLARE_FUN, smtcmd.DECLARE_CONST]:
             symbol = self.args[0]
             type_str = symbol.symbol_type().as_smtlib()
-            outstream.write("(%s %s %s)" % (self.name,
-                                            quote(symbol.symbol_name()),
-                                            type_str))
+            outstream.write(
+                "(%s %s %s)" % (self.name, quote(symbol.symbol_name()), type_str)
+            )
 
         elif self.name == smtcmd.DEFINE_FUN:
             name = self.args[0]
             params_list = self.args[1]
-            params = " ".join(["(%s %s)" % (v, v.symbol_type().as_smtlib(funstyle=False)) for v in params_list])
+            params = " ".join(
+                [
+                    "(%s %s)" % (v, v.symbol_type().as_smtlib(funstyle=False))
+                    for v in params_list
+                ]
+            )
             rtype = self.args[2]
             expr = self.args[3]
-            outstream.write("(%s %s (%s) %s " % (self.name,
-                                                name,
-                                                params,
-                                                rtype.as_smtlib(funstyle=False)))
+            outstream.write(
+                "(%s %s (%s) %s "
+                % (self.name, name, params, rtype.as_smtlib(funstyle=False))
+            )
             printer.printer(expr)
             outstream.write(")")
 
@@ -119,20 +134,20 @@ class SmtLibCommand(namedtuple('SmtLibCommand', ['name', 'args'])):
             params_list = self.args[1]
             params = " ".join(x.as_smtlib(funstyle=False) for x in params_list)
             rtype = self.args[2]
-            outstream.write("(%s %s (%s) %s)" % (self.name,
-                                                 name,
-                                                 params,
-                                                 rtype.as_smtlib(funstyle=False)))
+            outstream.write(
+                "(%s %s (%s) %s)"
+                % (self.name, name, params, rtype.as_smtlib(funstyle=False))
+            )
         elif self.name == smtcmd.DECLARE_SORT:
             type_decl = self.args[0]
-            outstream.write("(%s %s %d)" % (self.name,
-                                            type_decl.name,
-                                            type_decl.arity))
+            outstream.write("(%s %s %d)" % (self.name, type_decl.name, type_decl.arity))
 
         elif self.name in smtcmd.ALL_COMMANDS:
-            raise NotImplementedError("'%s' is a valid SMT-LIB command "\
-                                      "but it is currently not supported. "\
-                                      "Please open a bug-report." % self.name)
+            raise NotImplementedError(
+                "'%s' is a valid SMT-LIB command "
+                "but it is currently not supported. "
+                "Please open a bug-report." % self.name
+            )
         else:
             raise UnknownSmtLibCommandError(self.name)
 
@@ -143,15 +158,13 @@ class SmtLibCommand(namedtuple('SmtLibCommand', ['name', 'args'])):
 
 
 class SmtLibScript(object):
-
     def __init__(self):
         self.annotations = None
         self.commands = []
 
     def add(self, name, args):
         """Adds a new SmtLibCommand with the given name and arguments."""
-        self.add_command(SmtLibCommand(name=name,
-                                       args=args))
+        self.add_command(SmtLibCommand(name=name, args=args))
 
     def add_command(self, command):
         self.commands.append(command)
@@ -173,20 +186,25 @@ class SmtLibScript(object):
         return (cmd for cmd in self.commands if cmd.name in command_name_set)
 
     def get_strict_formula(self, mgr=None):
-        if self.contains_command(smtcmd.PUSH) or \
-           self.contains_command(smtcmd.POP):
+        if self.contains_command(smtcmd.PUSH) or self.contains_command(smtcmd.POP):
             raise PysmtValueError("Was not expecting push-pop commands")
         if self.count_command_occurrences(smtcmd.CHECK_SAT) != 1:
             raise PysmtValueError("Was expecting exactly one check-sat command")
         _And = mgr.And if mgr else get_env().formula_manager.And
 
-        assertions = [cmd.args[0]
-                      for cmd in self.filter_by_command_name([smtcmd.ASSERT])]
+        assertions = [
+            cmd.args[0] for cmd in self.filter_by_command_name([smtcmd.ASSERT])
+        ]
         return _And(assertions)
 
     def get_declared_symbols(self):
-        return {cmd.args[0] for cmd in self.filter_by_command_name([smtcmd.DECLARE_CONST,
-                                                                    smtcmd.DECLARE_FUN])}
+        return {
+            cmd.args[0]
+            for cmd in self.filter_by_command_name(
+                [smtcmd.DECLARE_CONST, smtcmd.DECLARE_FUN]
+            )
+        }
+
     def get_define_fun_parameter_symbols(self):
         res = set()
         for cmd in self.filter_by_command_name([smtcmd.DEFINE_FUN]):
@@ -256,23 +274,26 @@ def smtlibscript_from_formula(formula, logic=None):
         try:
             smt_logic = get_closer_smtlib_logic(f_logic)
         except NoLogicAvailableError:
-            warnings.warn("The logic %s is not reducible to any SMTLib2 " \
-                          "standard logic. Proceeding with non-standard " \
-                          "logic '%s'" % (f_logic, f_logic),
-                          stacklevel=3)
+            warnings.warn(
+                "The logic %s is not reducible to any SMTLib2 "
+                "standard logic. Proceeding with non-standard "
+                "logic '%s'" % (f_logic, f_logic),
+                stacklevel=3,
+            )
             smt_logic = f_logic
     elif not (isinstance(logic, Logic) or isinstance(logic, str)):
         raise UndefinedLogicError(str(logic))
     else:
         if logic not in SMTLIB2_LOGICS:
-            warnings.warn("The logic %s is not reducible to any SMTLib2 " \
-                          "standard logic. Proceeding with non-standard " \
-                          "logic '%s'" % (logic, logic),
-                          stacklevel=3)
+            warnings.warn(
+                "The logic %s is not reducible to any SMTLib2 "
+                "standard logic. Proceeding with non-standard "
+                "logic '%s'" % (logic, logic),
+                stacklevel=3,
+            )
         smt_logic = logic
 
-    script.add(name=smtcmd.SET_LOGIC,
-               args=[smt_logic])
+    script.add(name=smtcmd.SET_LOGIC, args=[smt_logic])
 
     # Declare all types
     types = get_env().typeso.get_types(formula, custom_only=True)
@@ -286,11 +307,9 @@ def smtlibscript_from_formula(formula, logic=None):
         script.add(name=smtcmd.DECLARE_FUN, args=[symbol])
 
     # Assert formula
-    script.add_command(SmtLibCommand(name=smtcmd.ASSERT,
-                                     args=[formula]))
+    script.add_command(SmtLibCommand(name=smtcmd.ASSERT, args=[formula]))
     # check-sat
-    script.add_command(SmtLibCommand(name=smtcmd.CHECK_SAT,
-                                     args=[]))
+    script.add_command(SmtLibCommand(name=smtcmd.CHECK_SAT, args=[]))
     return script
 
 
@@ -300,7 +319,7 @@ def evaluate_command(cmd, solver):
 
     if cmd.name == smtcmd.SET_OPTION:
         opt = cmd.args[0]
-        if opt[0] == ':':
+        if opt[0] == ":":
             opt = opt[1:]
         return solver.set_option(opt, cmd.args[1])
 
@@ -358,8 +377,10 @@ def evaluate_command(cmd, solver):
         return solver.declare_sort(name, arity)
 
     elif cmd.name in smtcmd.ALL_COMMANDS:
-        raise NotImplementedError("'%s' is a valid SMT-LIB command "\
-                                  "but it is currently not supported. "\
-                                  "Please open a bug-report." % cmd.name)
+        raise NotImplementedError(
+            "'%s' is a valid SMT-LIB command "
+            "but it is currently not supported. "
+            "Please open a bug-report." % cmd.name
+        )
     else:
         raise UnknownSmtLibCommandError(cmd.name)

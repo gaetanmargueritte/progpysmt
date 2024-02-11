@@ -75,9 +75,9 @@ class Simplifier(progpysmt.walkers.DagWalker):
         ltype = get_type(formula)
         rtype = get_type(res)
         test = Equals(formula, res) if ltype != BOOL else Iff(formula, res)
-        assert (ltype == rtype) and is_valid(test,
-                                             solver_name=self.validate_simplifications), \
-               ("Was: %s \n Obtained: %s\n" % (str(formula), str(res)))
+        assert (ltype == rtype) and is_valid(
+            test, solver_name=self.validate_simplifications
+        ), "Was: %s \n Obtained: %s\n" % (str(formula), str(res))
         return res
 
     def walk_and(self, formula, args, **kwargs):
@@ -243,7 +243,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
         if sr.is_zero() and sr.is_minus():
             x, y = sr.arg(0), sr.arg(1)
             return self.manager.LE(x, y)
-        return  self.manager.LE(sl, sr)
+        return self.manager.LE(sl, sr)
 
     def walk_lt(self, formula, args, **kwargs):
         assert len(args) == 2
@@ -306,6 +306,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
                         const_val = -const_val
                         if const.is_algebraic_constant():
                             from progpysmt.constants import Numeral
+
                             const = self.manager._Algebraic(Numeral(const_val))
                         elif ttype.is_real_type():
                             const = self.manager.Real(const_val)
@@ -323,6 +324,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
         const = None
         if is_algebraic:
             from progpysmt.constants import Numeral
+
             const = self.manager._Algebraic(Numeral(constant_add))
         elif ttype.is_real_type():
             const = self.manager.Real(constant_add)
@@ -376,6 +378,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
         const = None
         if is_algebraic:
             from progpysmt.constants import Numeral
+
             const = self.manager._Algebraic(Numeral(constant_mul))
         elif ttype.is_real_type():
             const = self.manager.Real(constant_mul)
@@ -407,6 +410,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
 
         if args[0].is_algebraic_constant():
             from progpysmt.constants import Numeral
+
             l = args[0].constant_value()
             r = args[1].constant_value()
             return self.manager._Algebraic(Numeral(l**r))
@@ -429,9 +433,9 @@ class Simplifier(progpysmt.walkers.DagWalker):
             r = sr.constant_value()
             return self.manager.Int(l - r)
 
-        if sl.is_algebraic_constant() and \
-           sr.is_algebraic_constant():
+        if sl.is_algebraic_constant() and sr.is_algebraic_constant():
             from progpysmt.constants import Numeral
+
             l = sl.constant_value()
             r = sr.constant_value()
             return self.mananger._Algebraic(Numeral(l - r))
@@ -491,14 +495,14 @@ class Simplifier(progpysmt.walkers.DagWalker):
 
     def walk_bv_not(self, formula, args, **kwargs):
         if args[0].is_bv_constant():
-            res = ~args[0].constant_value() & (2**formula.bv_width() - 1)
+            res = ~args[0].constant_value() & (2 ** formula.bv_width() - 1)
             return self.manager.BV(res, width=formula.bv_width())
         return self.manager.BVNot(args[0])
 
     def walk_bv_neg(self, formula, args, **kwargs):
         if args[0].is_bv_constant():
-            res = 2**formula.bv_width() - args[0].constant_value()
-            res = res % 2**formula.bv_width()
+            res = 2 ** formula.bv_width() - args[0].constant_value()
+            res = res % 2 ** formula.bv_width()
             return self.manager.BV(res, width=formula.bv_width())
         return self.manager.BVNeg(args[0])
 
@@ -688,19 +692,19 @@ class Simplifier(progpysmt.walkers.DagWalker):
             bitstr = args[0].bv_bin_str(reverse=True)
             start = formula.bv_extract_start()
             end = formula.bv_extract_end()
-            res = bitstr[start:end+1][::-1]
-            w = (end+1)-start
+            res = bitstr[start : end + 1][::-1]
+            w = (end + 1) - start
             return self.manager.BV("#b%s" % res, width=w)
-        return self.manager.BVExtract(args[0],
-                                      start=formula.bv_extract_start(),
-                                      end=formula.bv_extract_end())
+        return self.manager.BVExtract(
+            args[0], start=formula.bv_extract_start(), end=formula.bv_extract_end()
+        )
 
     def walk_bv_ror(self, formula, args, **kwargs):
         if args[0].is_bv_constant():
             bitstr = args[0].bv_bin_str(reverse=True)
             # Takes first k elements and move to end
-            slice1 = bitstr[0:formula.bv_rotation_step()]
-            slice2 = bitstr[formula.bv_rotation_step():]
+            slice1 = bitstr[0 : formula.bv_rotation_step()]
+            slice2 = bitstr[formula.bv_rotation_step() :]
             res = (slice2 + slice1)[::-1]
             return self.manager.BV(res)
         return self.manager.BVRor(args[0], formula.bv_rotation_step())
@@ -709,8 +713,8 @@ class Simplifier(progpysmt.walkers.DagWalker):
         if args[0].is_bv_constant():
             bitstr = args[0].bv_bin_str(reverse=True)
             # Takes last k elements and move to beginning
-            slice1 = bitstr[0:-formula.bv_rotation_step()]
-            slice2 = bitstr[-formula.bv_rotation_step():]
+            slice1 = bitstr[0 : -formula.bv_rotation_step()]
+            slice2 = bitstr[-formula.bv_rotation_step() :]
             res = (slice2 + slice1)[::-1]
             return self.manager.BV(res)
         return self.manager.BVRol(args[0], formula.bv_rotation_step())
@@ -719,7 +723,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
         if args[0].is_bv_constant():
             bitstr = args[0].bv_bin_str()
             filler = bitstr[0]
-            res = filler*formula.bv_extend_step() + bitstr
+            res = filler * formula.bv_extend_step() + bitstr
             return self.manager.BV(res, width=formula.bv_width())
         return self.manager.BVSExt(args[0], formula.bv_extend_step())
 
@@ -727,7 +731,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
         if args[0].is_bv_constant():
             bitstr = args[0].bv_bin_str()
             filler = "0"
-            res = filler*formula.bv_extend_step() + bitstr
+            res = filler * formula.bv_extend_step() + bitstr
             return self.manager.BV(res, width=formula.bv_width())
         return self.manager.BVZExt(args[0], formula.bv_extend_step())
 
@@ -735,8 +739,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
         if args[0].is_bv_constant() and args[1].is_bv_constant():
             w0 = args[0].bv_width()
             w1 = args[1].bv_width()
-            res = (2**w1) * args[0].bv_unsigned_value() + \
-                  args[1].bv_unsigned_value()
+            res = (2**w1) * args[0].bv_unsigned_value() + args[1].bv_unsigned_value()
             return self.manager.BV(res, w1 + w0)
         return self.manager.BVConcat(args[0], args[1])
 
@@ -757,7 +760,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
                     simplified = self.manager.BVZero(width)
                 elif args[0].is_bv_constant():
                     res = args[0].bv_unsigned_value() << rhs
-                    simplified = self.manager.BV(res % (2 ** width), width)
+                    simplified = self.manager.BV(res % (2**width), width)
         elif args[0].is_bv_constant() and args[0].bv_unsigned_value() == 0:
             # 0 << x -> 0
             simplified = args[0]
@@ -784,7 +787,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
                     simplified = self.manager.BVZero(width)
                 elif args[0].is_bv_constant():
                     res = args[0].bv_unsigned_value() >> rhs
-                    simplified = self.manager.BV(res % (2 ** width), width)
+                    simplified = self.manager.BV(res % (2**width), width)
         elif args[0].is_bv_constant() and args[0].bv_unsigned_value() == 0:
             # 0 >> x -> 0
             simplified = args[0]
@@ -808,7 +811,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
                 simplified = args[0]
             elif args[0].is_bv_constant():
                 res = args[0].constant_value() - rhs
-                res = res % 2**formula.bv_width()
+                res = res % 2 ** formula.bv_width()
                 simplified = self.manager.BV(res, width=formula.bv_width())
 
         if simplified is not None:
@@ -845,53 +848,47 @@ class Simplifier(progpysmt.walkers.DagWalker):
             return self.manager.BVComp(sl, sr)
 
     def walk_bv_sdiv(self, formula, args, **kwargs):
-        l,r = args
+        l, r = args
         if l.is_bv_constant() and r.is_bv_constant():
             l_sign = l.bv_signed_value() < 0
             r_sign = r.bv_signed_value() < 0
             if (not l_sign) and (not r_sign):
-                return self.walk_bv_udiv(self.manager.BVUDiv(l,r), args, **kwargs)
+                return self.walk_bv_udiv(self.manager.BVUDiv(l, r), args, **kwargs)
             elif l_sign and (not r_sign):
                 nl = self.walk_bv_neg(self.manager.BVNeg(l), [l], **kwargs)
-                div = self.walk_bv_udiv(self.manager.BVUDiv(nl, r), [nl, r],
-                                        **kwargs)
+                div = self.walk_bv_udiv(self.manager.BVUDiv(nl, r), [nl, r], **kwargs)
                 return self.walk_bv_neg(self.manager.BVNeg(div), [div], **kwargs)
             elif (not l_sign) and r_sign:
                 nr = self.walk_bv_neg(self.manager.BVNeg(r), [r], **kwargs)
-                div = self.walk_bv_udiv(self.manager.BVUDiv(l, nr), [l, nr],
-                                        **kwargs)
+                div = self.walk_bv_udiv(self.manager.BVUDiv(l, nr), [l, nr], **kwargs)
                 return self.walk_bv_neg(self.manager.BVNeg(div), [div], **kwargs)
             else:
                 nl = self.walk_bv_neg(self.manager.BVNeg(l), [l], **kwargs)
                 nr = self.walk_bv_neg(self.manager.BVNeg(r), [r], **kwargs)
-                return self.walk_bv_udiv(self.manager.BVUDiv(nl, nr), [nl, nr],
-                                         **kwargs)
+                return self.walk_bv_udiv(
+                    self.manager.BVUDiv(nl, nr), [nl, nr], **kwargs
+                )
         return self.manager.BVSDiv(l, r)
 
     def walk_bv_srem(self, formula, args, **kwargs):
         if args[0].is_bv_constant() and args[1].is_bv_constant():
             l = args[0]
             if args[0].bv_signed_value() < 0:
-                l = self.walk_bv_neg(self.manager.BVNeg(args[0]), [args[0]],
-                                     **kwargs)
+                l = self.walk_bv_neg(self.manager.BVNeg(args[0]), [args[0]], **kwargs)
 
             r = args[1]
             if args[1].bv_signed_value() < 0:
-                r = self.walk_bv_neg(self.manager.BVNeg(args[1]), [args[1]],
-                                     **kwargs)
+                r = self.walk_bv_neg(self.manager.BVNeg(args[1]), [args[1]], **kwargs)
 
-
-            res = self.walk_bv_urem(self.manager.BVURem(l, r), [l, r],
-                                    **kwargs)
+            res = self.walk_bv_urem(self.manager.BVURem(l, r), [l, r], **kwargs)
 
             if args[0].bv_signed_value() < 0:
-                res = self.walk_bv_neg(self.manager.BVNeg(res), [res],
-                                       **kwargs)
+                res = self.walk_bv_neg(self.manager.BVNeg(res), [res], **kwargs)
             return res
         return self.manager.BVSRem(args[0], args[1])
 
     def walk_bv_ashr(self, formula, args, **kwargs):
-        l,r = args
+        l, r = args
         if l.is_bv_constant() and r.is_bv_constant():
             sign = l.bv_signed_value() < 0
             ret = self.walk_bv_lshr(self.manager.BVLShr(l, r), [l, r], **kwargs)
@@ -902,7 +899,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
                 if width > r.bv_unsigned_value():
                     padlen = r.bv_unsigned_value()
 
-                for i in range(width-padlen, width):
+                for i in range(width - padlen, width):
                     n = set_bit(n, i, True)
                 ret = self.manager.BV(n, width)
             return ret
@@ -920,15 +917,15 @@ class Simplifier(progpysmt.walkers.DagWalker):
             return self.manager.String(ret)
         return self.manager.StrConcat(args)
 
-    def walk_str_charat(self, formula,  args, **kwargs):
+    def walk_str_charat(self, formula, args, **kwargs):
         s, i = args
         if s.is_string_constant() and i.is_int_constant():
-            res = s.constant_value()[i.constant_value():i.constant_value() + 1]
+            res = s.constant_value()[i.constant_value() : i.constant_value() + 1]
             return self.manager.String(res)
         return self.manager.StrCharat(s, i)
 
     def walk_str_contains(self, formula, args, **kwargs):
-        s,t = args
+        s, t = args
         if s.is_string_constant() and t.is_string_constant():
             return self.manager.Bool(t.constant_value() in s.constant_value())
         return self.manager.StrContains(s, t)
@@ -943,7 +940,11 @@ class Simplifier(progpysmt.walkers.DagWalker):
 
     def walk_str_replace(self, formula, args, **kwargs):
         s, t1, t2 = args
-        if s.is_string_constant() and t1.is_string_constant() and t2.is_string_constant():
+        if (
+            s.is_string_constant()
+            and t1.is_string_constant()
+            and t2.is_string_constant()
+        ):
             t1_str = t1.constant_value()
             t2_str = t2.constant_value()
             s_str = s.constant_value()
@@ -1003,17 +1004,15 @@ class Simplifier(progpysmt.walkers.DagWalker):
         a, i, v = args
         if a.is_array_value() and i.is_constant():
             assign = a.array_value_assigned_values_map()
-            assign[i] = v # Add / Overwrite assignment at index i
-            return self.manager.Array(a.array_value_index_type(),
-                                      a.array_value_default(),
-                                      assign)
+            assign[i] = v  # Add / Overwrite assignment at index i
+            return self.manager.Array(
+                a.array_value_index_type(), a.array_value_default(), assign
+            )
         return self.manager.Store(a, i, v)
 
     def walk_array_value(self, formula, args, **kwargs):
         assign = dict(zip(args[1::2], args[2::2]))
-        return self.manager.Array(formula.array_value_index_type(),
-                                  args[0],
-                                  assign)
+        return self.manager.Array(formula.array_value_index_type(), args[0], assign)
 
     def walk_div(self, formula, args, **kwargs):
         sl = args[0]
@@ -1050,6 +1049,7 @@ class Simplifier(progpysmt.walkers.DagWalker):
     def walk_identity(self, formula, args, **kwargs):
         return formula
 
+
 # EOC Simplifier
 
 
@@ -1078,9 +1078,9 @@ class BddSimplifier(Simplifier):
 
         Solver = self.env.factory.Solver
         if static_ordering is not None:
-            solver_options={'static_ordering': static_ordering}
+            solver_options = {"static_ordering": static_ordering}
         else:
-            solver_options={'dynamic_reordering': True}
+            solver_options = {"dynamic_reordering": True}
         self.s = Solver(name="bdd", solver_options=solver_options)
         self.convert = self.s.converter.convert
         self.back = self.s.converter.back
@@ -1096,17 +1096,20 @@ class BddSimplifier(Simplifier):
 
     @validate_simplifications.setter
     def validate_simplifications(self, value):
-        possible_solvers = [sname for sname in self.env.factory.all_solvers()\
-                            if sname!="bdd"]
+        possible_solvers = [
+            sname for sname in self.env.factory.all_solvers() if sname != "bdd"
+        ]
         if len(possible_solvers) == 0:
-            raise PysmtValueError("To validate at least another solver must "
-                                  "be available!")
+            raise PysmtValueError(
+                "To validate at least another solver must " "be available!"
+            )
         self._validation_sname = possible_solvers[0]
         self._validate_simplifications = value
 
     def simplify(self, formula):
         from progpysmt.oracles import get_logic
         from progpysmt.logics import BOOL, QF_BOOL
+
         if self.bool_abstraction:
             logic = get_logic(formula)
             if logic > QF_BOOL and logic != BOOL:
@@ -1123,8 +1126,9 @@ class BddSimplifier(Simplifier):
             Iff = self.env.formula_manager.Iff
             is_valid = self.env.factory.is_valid
             sname = self._validation_sname
-            assert is_valid(Iff(old, new), solver_name=sname ), \
-              "Was: %s \n Obtained: %s\n" % (str(old), str(new))
+            assert is_valid(
+                Iff(old, new), solver_name=sname
+            ), "Was: %s \n Obtained: %s\n" % (str(old), str(new))
 
     def abstract_and_simplify(self, formula):
         abs_formula = self.walk(formula)
@@ -1150,4 +1154,4 @@ class BddSimplifier(Simplifier):
         return rewritten
 
 
-#EOC BddSimplifier
+# EOC BddSimplifier

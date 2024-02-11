@@ -16,6 +16,7 @@
 #   limitations under the License.
 #
 
+
 class Annotations(object):
     """Handles and stores (key,value) annotations for formulae"""
 
@@ -25,7 +26,6 @@ class Annotations(object):
         else:
             self._annotations = {}
 
-
     def add(self, formula, annotation, value=None):
         """Adds an annotation for the given formula, possibly with the
         specified value"""
@@ -34,19 +34,16 @@ class Annotations(object):
         if value is not None:
             values.add(value)
 
-
     def remove(self, formula):
         """Removes all the annotations for the given formula"""
         if formula in self._annotations:
             del self._annotations[formula]
-
 
     def remove_annotation(self, formula, annotation):
         """Removes the given annotation for the given formula"""
         if formula in self._annotations:
             if annotation in self._annotations[formula]:
                 del self._annotations[formula][annotation]
-
 
     def remove_value(self, formula, annotation, value):
         """Removes the given annotation for the given formula"""
@@ -55,7 +52,6 @@ class Annotations(object):
                 d = self._annotations[formula][annotation]
                 if value in d:
                     d.remove(value)
-
 
     def has_annotation(self, formula, annotation, value=None):
         """Returns True iff the given formula has the given annotation. If
@@ -67,9 +63,8 @@ class Annotations(object):
                 if value is None:
                     return True
                 else:
-                    return (value in self._annotations[formula][annotation])
+                    return value in self._annotations[formula][annotation]
         return False
-
 
     def annotations(self, formula):
         """Returns a dictionary containing all the annotations for the given
@@ -80,7 +75,6 @@ class Annotations(object):
             return self._annotations[formula]
         except KeyError:
             return None
-
 
     def all_annotated_formulae(self, annotation, value=None):
         """Returns the set of all the formulae having the given annotation
@@ -98,11 +92,9 @@ class Annotations(object):
                         res.append(f)
         return set(res)
 
-
     def __contains__(self, formula):
         """Checks if formula has at least one annotation"""
         return formula in self._annotations
-
 
     def __str__(self):
         res = ["Annotations: {"]
@@ -114,7 +106,6 @@ class Annotations(object):
                     res.append(str(v) + ", ")
                 res.append("} ")
         return "".join(res + ["}"])
-
 
     def __getitem__(self, formula):
         return self.annotations(formula)

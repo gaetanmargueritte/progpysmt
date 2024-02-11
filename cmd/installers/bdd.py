@@ -20,18 +20,28 @@ class CuddInstaller(SolverInstaller):
 
     SOLVER = "bdd"
 
-    def __init__(self, install_dir, bindings_dir, solver_version,
-                 mirror_link=None, git_version='HEAD'):
+    def __init__(
+        self,
+        install_dir,
+        bindings_dir,
+        solver_version,
+        mirror_link=None,
+        git_version="HEAD",
+    ):
         archive_name = "repycudd-%s.tar.gz" % git_version
-        native_link = "https://codeload.github.com/pysmt/repycudd/tar.gz/%s" % git_version
-        SolverInstaller.__init__(self, install_dir=install_dir,
-                                 bindings_dir=bindings_dir,
-                                 solver_version=solver_version,
-                                 archive_name=archive_name,
-                                 native_link=native_link,
-                                 mirror_link=mirror_link)
+        native_link = (
+            "https://codeload.github.com/pysmt/repycudd/tar.gz/%s" % git_version
+        )
+        SolverInstaller.__init__(
+            self,
+            install_dir=install_dir,
+            bindings_dir=bindings_dir,
+            solver_version=solver_version,
+            archive_name=archive_name,
+            native_link=native_link,
+            mirror_link=mirror_link,
+        )
         self.git_version = git_version
-
 
     def compile(self):
         # Select the correct Makefile to be used
@@ -41,22 +51,27 @@ class CuddInstaller(SolverInstaller):
 
         swig = "swig"
         swig_version = SolverInstaller.run("swig -version", get_output=True)
-        if '4.0.1' in swig_version or '4.0.0' in swig_version:
-            print("WARNING: the BDD solver does not work with Swig4 < 4.0.2. Fallback to Swig3")
-            swig = "swig3.0" # This is the Ubuntu naming of the executable
+        if "4.0.1" in swig_version or "4.0.0" in swig_version:
+            print(
+                "WARNING: the BDD solver does not work with Swig4 < 4.0.2. Fallback to Swig3"
+            )
+            swig = "swig3.0"  # This is the Ubuntu naming of the executable
 
         import distutils.sysconfig as sysconfig
-        PYTHON_INCLUDE_DIR = sysconfig.get_python_inc()
-        SolverInstaller.run("make -C %s -f %s PYTHON_INCL=-I%s SWIG=%s" %
-                            (self.extract_path, makefile, PYTHON_INCLUDE_DIR, swig))
 
+        PYTHON_INCLUDE_DIR = sysconfig.get_python_inc()
+        SolverInstaller.run(
+            "make -C %s -f %s PYTHON_INCL=-I%s SWIG=%s"
+            % (self.extract_path, makefile, PYTHON_INCLUDE_DIR, swig)
+        )
 
     def move(self):
-        SolverInstaller.mv(os.path.join(self.extract_path, "repycudd.py"),
-                           self.bindings_dir)
-        SolverInstaller.mv(os.path.join(self.extract_path, "_repycudd.so"),
-                           self.bindings_dir)
-
+        SolverInstaller.mv(
+            os.path.join(self.extract_path, "repycudd.py"), self.bindings_dir
+        )
+        SolverInstaller.mv(
+            os.path.join(self.extract_path, "_repycudd.so"), self.bindings_dir
+        )
 
     def get_installed_version(self):
         return self.get_installed_version_script(self.bindings_dir, "cudd")

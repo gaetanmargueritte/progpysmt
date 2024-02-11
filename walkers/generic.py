@@ -18,6 +18,7 @@
 from functools import partial
 
 import sys
+
 if sys.version_info >= (3, 3):
     from collections.abc import Iterable
 else:
@@ -31,6 +32,7 @@ def nt_to_fun(o):
     """Returns the name of the walk function for the given nodetype."""
     return "walk_%s" % op.op_to_str(o).lower()
 
+
 class handles(object):
     """Decorator for walker functions.
 
@@ -43,6 +45,7 @@ class handles(object):
          ...
 
     """
+
     def __init__(self, *nodetypes):
         if len(nodetypes) == 1 and isinstance(nodetypes[0], Iterable):
             nodetypes = nodetypes[0]
@@ -55,11 +58,13 @@ class handles(object):
         func.nodetypes = nodetypes
         return func
 
+
 class MetaNodeTypeHandler(type):
-    """Metaclass used to intepret the nodehandler decorator. """
+    """Metaclass used to intepret the nodehandler decorator."""
+
     def __new__(cls, name, bases, dct):
         obj = type.__new__(cls, name, bases, dct)
-        for k,v in dct.items():
+        for k, v in dct.items():
             if hasattr(v, "nodetypes"):
                 obj.set_handler(v, *v.nodetypes)
         return obj
@@ -74,6 +79,7 @@ class Walker(object, metaclass=MetaNodeTypeHandler):
     def __init__(self, env=None):
         if env is None:
             import progpysmt.environment
+
             env = progpysmt.environment.get_env()
         self.env = env
 
@@ -91,8 +97,12 @@ class Walker(object, metaclass=MetaNodeTypeHandler):
         node_types with the given function
         """
         from warnings import warn
-        warn("Instance-based walkers (<=0.6.0) walkers are deprecated. "
-             "You should use new-style/class based walkers", stacklevel=2)
+
+        warn(
+            "Instance-based walkers (<=0.6.0) walkers are deprecated. "
+            "You should use new-style/class based walkers",
+            stacklevel=2,
+        )
         for nt in node_types:
             self.functions[nt] = function
 
@@ -126,7 +136,9 @@ class Walker(object, metaclass=MetaNodeTypeHandler):
                 return self.functions[node_type](formula, **kwargs)
 
         node_type = formula.node_type()
-        raise progpysmt.exceptions.UnsupportedOperatorError(node_type=node_type,
-                                                        expression=formula)
+        raise progpysmt.exceptions.UnsupportedOperatorError(
+            node_type=node_type, expression=formula
+        )
+
 
 # EOC Walker

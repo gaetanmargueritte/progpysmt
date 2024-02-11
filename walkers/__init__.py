@@ -34,13 +34,17 @@ it only once.
 """
 
 from progpysmt.walkers.dag import DagWalker
+
 assert DagWalker
 
 from progpysmt.walkers.tree import TreeWalker
+
 assert TreeWalker
 
 from progpysmt.walkers.identitydag import IdentityDagWalker
+
 assert IdentityDagWalker
 
 from progpysmt.walkers.generic import handles
+
 assert handles

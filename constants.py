@@ -17,6 +17,7 @@
 import os
 
 from progpysmt.exceptions import PysmtImportError
+
 # The environment variable can be used to force the configuration
 # of the Fraction class.
 #
@@ -36,6 +37,7 @@ if ENV_USE_GMPY is not None:
 HAS_GMPY = False
 try:
     from gmpy2 import mpq, mpz
+
     HAS_GMPY = True
 except ImportError as ex:
     if ENV_USE_GMPY is True:
@@ -52,7 +54,7 @@ else:
     USE_GMPY = HAS_GMPY
 
 if HAS_GMPY:
-    mpq_type = type(mpq(1,2))
+    mpq_type = type(mpq(1, 2))
     mpz_type = type(mpz(1))
 else:
     mpq_type = None
@@ -63,11 +65,12 @@ else:
 #
 
 from fractions import Fraction as pyFraction
+
 if USE_GMPY:
     Fraction = mpq
 else:
     Fraction = pyFraction
-FractionClass = type(Fraction(1,2))
+FractionClass = type(Fraction(1, 2))
 
 
 def is_pysmt_fraction(var):
@@ -76,6 +79,7 @@ def is_pysmt_fraction(var):
     This takes into account the class being used to represent the Fraction.
     """
     return type(var) == FractionClass
+
 
 #
 # Integers using GMPY2
@@ -142,13 +146,16 @@ def to_python_integer(value):
 
 
 if USE_GMPY:
+
     def pysmt_fraction_from_rational(value):
         """Return a pysmt Fraction for the rational value."""
         if type(value) == FractionClass:
             # Nothing to do
             return value
         return Fraction(value)
+
 else:
+
     def pysmt_fraction_from_rational(value):
         """Return a pysmt Fraction for the rational value."""
         if type(value) == FractionClass:
@@ -165,6 +172,7 @@ else:
         else:
             return Fraction(value)
 
+
 #
 # Algebraic Numbers Using Z3
 #
@@ -172,22 +180,30 @@ else:
 USE_Z3 = False
 try:
     import z3.z3num
+
     USE_Z3 = True
 except ImportError:
     pass
 
 if USE_Z3:
+
     class Numeral(z3.z3num.Numeral):
         """Represents a Number (Algebraic)"""
+
         def __hash__(self):
             return hash(self.sexpr())
 
 else:
+
     class Numeral(object):
         """Represents a Number (Algebraic)"""
+
         def __init__(self, obj):
-            raise NotImplementedError("Z3 is not installed. "\
-                "We currently do not support stand-alone algebraic numbers.")
+            raise NotImplementedError(
+                "Z3 is not installed. "
+                "We currently do not support stand-alone algebraic numbers."
+            )
+
 
 #
 # Strings

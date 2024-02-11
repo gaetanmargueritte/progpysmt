@@ -25,8 +25,8 @@ from pysmt.smtlib.annotations import Annotations
 from pysmt.shortcuts import Symbol
 from pysmt.test import TestCase, main
 
-class TestBasic(TestCase):
 
+class TestBasic(TestCase):
     def test_basic(self):
         ann = Annotations()
         a = Symbol("a")
@@ -128,7 +128,7 @@ class TestBasic(TestCase):
         self.assertEqual(curr_a1, set([a1]))
 
     def test_interpreting_annotations(self):
-        source ="""\
+        source = """\
 (declare-fun |"v__AT0"| () Bool)
 (declare-fun |"v__AT1"| () Bool)
 (define-fun .def_1 () Bool (! |"v__AT0"| :next |"v__AT1"|))
@@ -142,9 +142,8 @@ class TestBasic(TestCase):
         self.env.formula_manager.get_symbol(v1_str)
         self.assertEqual(v1_str, '"v__AT1"')
 
-
     def test_complex_annotations_values(self):
-        source ="""\
+        source = """\
 (declare-fun |"v__AT0"| () Bool)
 (define-fun .def_1 () Bool (! |"v__AT0"| :next (+ 1     meaningless)))
 """
@@ -156,9 +155,8 @@ class TestBasic(TestCase):
         v1_str = next(iter(ann[v0]["next"]))
         self.assertEqual(v1_str, "(+ 1     meaningless)")
 
-
     def test_annotations_colon_values(self):
-        source ="""\
+        source = """\
 (declare-fun |"v__AT0"| () Bool)
 (define-fun .def_1 () Bool (! |"v__AT0"| :next :this_is_considered_a_value))
 """
@@ -171,5 +169,5 @@ class TestBasic(TestCase):
         self.assertEqual(v1_str, ":this_is_considered_a_value")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
