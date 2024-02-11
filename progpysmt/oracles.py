@@ -30,7 +30,7 @@ import progpysmt
 import progpysmt.walkers as walkers
 import progpysmt.operators as op
 
-from progpysmt import typing
+from progpysmt import ppsmttyping
 
 from progpysmt.logics import Logic, Theory, get_closer_pysmt_logic
 

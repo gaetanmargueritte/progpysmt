@@ -97,7 +97,7 @@ from progpysmt.operators import (
     CONSTANTS,
 )
 
-from progpysmt.typing import BOOL, REAL, INT, BVType, STRING
+from progpysmt.ppsmttyping import BOOL, REAL, INT, BVType, STRING
 from progpysmt.decorators import deprecated, assert_infix_enabled
 from progpysmt.utils import twos_complement
 from progpysmt.constants import (

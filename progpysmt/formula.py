@@ -36,7 +36,7 @@ else:
 
 import warnings
 
-import progpysmt.typing as types
+import progpysmt.ppsmttyping as types
 import progpysmt.operators as op
 
 

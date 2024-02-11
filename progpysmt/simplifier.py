@@ -20,7 +20,7 @@ import math
 import progpysmt.walkers
 from progpysmt.walkers import handles
 import progpysmt.operators as op
-import progpysmt.typing as types
+import progpysmt.ppsmttyping as types
 from progpysmt.utils import set_bit
 from progpysmt.exceptions import PysmtValueError
 from progpysmt.fnode import FNode

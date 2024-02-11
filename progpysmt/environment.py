@@ -29,7 +29,7 @@ import progpysmt.oracles
 import progpysmt.formula
 import progpysmt.factory
 import progpysmt.decorators
-import progpysmt.typing
+import progpysmt.ppsmttyping
 
 
 class Environment(object):
@@ -44,7 +44,7 @@ class Environment(object):
 
     TypeCheckerClass = progpysmt.type_checker.SimpleTypeChecker
     FormulaManagerClass = progpysmt.formula.FormulaManager
-    TypeManagerClass = progpysmt.typing.TypeManager
+    TypeManagerClass = progpysmt.ppsmttyping.TypeManager
     SimplifierClass = progpysmt.simplifier.Simplifier
     # SubstituterClass = pysmt.substituter.MSSubstituter
     SubstituterClass = progpysmt.substituter.MGSubstituter

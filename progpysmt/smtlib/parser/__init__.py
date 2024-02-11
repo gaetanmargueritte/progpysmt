@@ -18,6 +18,7 @@
 import os
 
 from progpysmt.exceptions import PysmtImportError
+from pyximport._pyximport3 import build_module
 
 #
 # Try to import the Cython version of the parser.
@@ -90,7 +91,7 @@ else:
     path = os.path.join(os.path.dirname(__file__), "parser.py")
     name = "progpysmt.smtlib.parser.parser"
 
-    so_path = pyximport.build_module(name, path, pyxbuild_dir=build_dir)
+    so_path = build_module(name, path, pyxbuild_dir=build_dir)
     mod = imp.load_dynamic(name, so_path)
     assert mod.__file__ == so_path, (mod.__file__, so_path)
     # print(so_path)

@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from progpysmt.typing import BOOL
+from progpysmt.ppsmttyping import BOOL
 from progpysmt.solvers.options import SolverOptions
 from progpysmt.decorators import clear_pending_pop
 from progpysmt.exceptions import (

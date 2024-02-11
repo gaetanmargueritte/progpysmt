@@ -35,7 +35,7 @@ from progpysmt.exceptions import PysmtTypeError
 from progpysmt.smtlib.script import SmtLibCommand, SmtLibScript
 from progpysmt.smtlib.annotations import Annotations
 from progpysmt.constants import Fraction
-from progpysmt.typing import _TypeDecl, PartialType
+from progpysmt.ppsmttyping import _TypeDecl, PartialType
 from progpysmt.substituter import FunctionInterpretation
 from progpysmt.pslobject import PSLObject, Method, Constraint
 import re
