@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "progpysmt"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Python parser for SMT-LIB, SyGuS and ProgSynth formats."
 authors = ["Gaëtan MARGUERITTE <gamargueritte@gmail.com>"]
 license = "MIT"

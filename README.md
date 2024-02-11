@@ -12,11 +12,18 @@ from  progpysmt.pslobject  import  PSLObject
 parser = ProgSmtLibParser()
 with open(file_name) as f:
 	pslobject = parser.get_script(f, file_name)
-```   
+```
+   
 This will create a `PSLObject` that contains all the values required to use ProgSynth.
 
 # Installation
 ## From source
 If you install this from source, you will need Python 3.7 or higher.
-## Poetry
- 
+### Install
+You can use pip to install the project.
+
+```shell
+pip install progpysmt
+```
+
+
